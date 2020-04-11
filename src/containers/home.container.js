@@ -1,6 +1,7 @@
 import React from "react";
 import {connect} from 'react-redux';
-import {generalUrlRequest} from '../actions/home.action'
+import { generalUrlRequest, customUrlRequest } from '../actions/home.action'
+import Axios from 'axios';
 
 import './stylesheets/home.css';
 
@@ -19,9 +20,20 @@ class UserLogin extends React.Component {
     //     event.preventDefault();
     // }
 
+    _handleCustomFormUpdate(event, value) {
+        this.setState({
+            [value]: event.target.value || ''
+        })
+    }
+
+    _customUrlRequest() {
+        this.props.customUrlRequest(this.state);
+        event.preventDefault();
+    }
+
     _handleGeneralFormUpdate(event, value) {
         this.setState({
-            full: event.target.value,
+            generalFullUrl: event.target.value || '',
         })
     }
 
@@ -31,6 +43,7 @@ class UserLogin extends React.Component {
     }
 
     componentDidMount() {
+
         // this.props.clear();
         // this.setState({username: '', password: ''});
     }
@@ -40,6 +53,14 @@ class UserLogin extends React.Component {
         // if (this.props.error) {
         //     error = (<h3>{this.props.error}</h3>)
         // }
+        async function redirect() {
+            let redirect = await Axios.get(`/api/shortUrls${window.location.pathname}`);
+            window.location.replace(redirect.data);
+        }
+
+        if (window.location.pathname.startsWith("/url/")  && !window.location.pathname.endsWith("edit")) {
+            redirect();
+        }
 
         return (
             <div>
@@ -55,8 +76,8 @@ class UserLogin extends React.Component {
                                         className="url-input my-1"
                                         placeholder="URL to shorten..."
                                         disabled={this.props.inFlight}
-                                        value={this.state.full}
-                                        onChange={e => this._handleGeneralFormUpdate(e, 'full')}/>
+                                        value={this.state.generalFullUrl}
+                                        onChange={e => this._handleGeneralFormUpdate(e, 'generalFullUrl')}/>
                                 <input
                                     type="submit"
                                     className="my-1"
@@ -67,25 +88,26 @@ class UserLogin extends React.Component {
                         </div>
                         <div className="shortner-container">
                             <h3>Custom Shortner</h3>
-                            <form className="url-form" onSubmit={(e) => this.handleSubmit(e)}>
+                            <form className="url-form" onSubmit={(e) => this._customUrlRequest(e)}>
                                 <input type="text"
                                         className="url-input my-1"
                                         placeholder="URL to shorten..."
                                         disabled={this.props.inFlight}
-                                        value={this.state.username}
-                                        onChange={(e) => this.handleChange(e, 'username')}/>
+                                        value={this.state.customFullUrl}
+                                        onChange={(e) => this._handleCustomFormUpdate(e, 'customFullUrl')}/>
                                 <input type="text"
                                         className="url-input my-1"
                                         placeholder="Custom Route Ending..."
                                         disabled={this.props.inFlight}
-                                        value={this.state.password}
-                                        onChange={(e) => this.handleChange(e, 'password')}/>
+                                        value={this.state.customShortUrl}
+                                        onChange={(e) => this._handleCustomFormUpdate(e, 'customShortUrl')}/>
                                 <input
                                     type="submit"
                                     className="my-1"
                                     value="Submit" disabled={this.props.inFlight}
                                 />
                             </form>
+                            {this._renderMostRecentCustomUrl()}
                         </div>
                     </div>
                 </div>
@@ -94,7 +116,6 @@ class UserLogin extends React.Component {
     }
 
     _renderMostRecentGeneralUrl() {
-
         if (this.props.mostRecentGeneralUrl) {
             return (
                 <div>
@@ -107,19 +128,35 @@ class UserLogin extends React.Component {
             return null;
         }
     }
+
+    _renderMostRecentCustomUrl() {
+        if (this.props.mostRecentCustomUrl) {
+            return (
+                <div>
+                    <a href={window.location.protocol +'//'+ window.location.host + '/url/' + this.props.mostRecentCustomUrl}>
+                        {window.location.protocol +'//'+ window.location.host + '/url/' + this.props.mostRecentCustomUrl}
+                    </a>
+                </div>
+            )
+        } else {
+            return null;
+        }
+    }
 }
 
 
 function mapDispatchToProps(dispatch, props) {
     return {
-        generalUrlRequest: (urlRequest) => dispatch(generalUrlRequest(urlRequest))
+        generalUrlRequest: (urlRequest) => dispatch(generalUrlRequest(urlRequest)),
+        customUrlRequest: (urlRequest) => dispatch(customUrlRequest(urlRequest))
     }
 };
 
 
 function mapStateToProps(state, props) {
     return {
-        mostRecentGeneralUrl: state.mostRecentGeneralUrl.shortUrl
+        mostRecentGeneralUrl: state.mostRecentGeneralUrl.shortUrl,
+        mostRecentCustomUrl: state.mostRecentCustomUrl.shortUrlCustom,
     }
 };
 

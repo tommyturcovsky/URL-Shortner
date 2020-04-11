@@ -17,7 +17,7 @@ ReactDOM.render(
     <Provider store={userStore}>
         <BrowserRouter>
             <Switch>
-                <Route path="/" component={HomePage}/>
+                <Route path="/" component={HomePage} />
             </Switch>
         </BrowserRouter>
     </Provider>,

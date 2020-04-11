@@ -24,9 +24,9 @@ router.get('/:id', async function (req, res) {
             (error) =>  res.status(404).send(`Error finding ShortUrl:${error}`));
 });
 
-router.get('/url/:shortUrl', async (req, res) => {
+router.get('/url/:shortUrl', async function (req, res) {
     return await ShortUrlAccessor.redirectToFullUrl(req.params.shortUrl)
-    .then((response) => res.redirect(response.full, 302),
+        .then((response) => res.status(200).send(response.full),
         (error) =>  response.status(404).send(`Error finding ShortUrl:${error}`));
 })
 

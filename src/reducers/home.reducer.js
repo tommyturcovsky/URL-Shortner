@@ -7,7 +7,7 @@ export function inFlight(state = false, action) {
 
 export function mostRecentGeneralUrl(
     state = {
-        shortUrl: "",
+        shortUrl: ""
     },
     action
 ) {
@@ -19,7 +19,22 @@ export function mostRecentGeneralUrl(
         default:
             return state
     }
-    // return state;
+}
+
+export function mostRecentCustomUrl(
+    state = {
+        shortUrlCustom: ""
+    },
+    action
+) {
+    switch (action.type) {
+        case 'RECEIVE_CUSTOM_SHORT_URL':
+            return Object.assign({}, state, {
+                shortUrlCustom: action.shortUrlCustom,
+            });
+        default:
+            return state
+    }
 }
 
 function loading(state = false, action) {
@@ -37,5 +52,6 @@ function loading(state = false, action) {
 export default combineReducers({
     inFlight,
     mostRecentGeneralUrl,
+    mostRecentCustomUrl,
     loading,
 });
