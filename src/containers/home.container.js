@@ -1,24 +1,50 @@
 import React from "react";
 import {connect} from 'react-redux';
-import { generalUrlRequest, customUrlRequest } from '../actions/home.action'
+import {
+    generalUrlRequest,
+    customUrlRequest,
+    editUrlRequest,
+    deleteCustomUrl
+} from '../actions/home.action'
 import Axios from 'axios';
 
 import './stylesheets/home.css';
+import {Modal, Button} from 'react-bootstrap'
 
 class UserLogin extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {};
+        this.state = {
+            showEditModal: false
+        };
     }
 
-    // handleChange(event, value) {
-    //     this.setState({[value]: event.target.value || ''});
-    // }
+    openEditModal() {
+        this.setState({
+            showEditModal: true
+        })
+    }
 
-    // handleSubmit(event) {
-    //     this.props.login(this.state);
-    //     event.preventDefault();
-    // }
+    closeEditModal() {
+        this.setState({
+            showEditModal: false
+        })
+    }
+
+    _handleEditFormUpdate(event, value) {
+        this.setState({
+            [value]: event.target.value || ''
+        })
+    }
+
+    _editUrlRequest() {
+        let urlToUpdate = this.props.mostRecentCustomUrl
+        this.props.editUrlRequest(urlToUpdate, this.state);
+        event.preventDefault();
+        this.setState({
+            showEditModal: false
+        })
+    }
 
     _handleCustomFormUpdate(event, value) {
         this.setState({
@@ -40,6 +66,10 @@ class UserLogin extends React.Component {
     _generalUrlRequest() {
         this.props.generalUrlRequest(this.state);
         event.preventDefault();
+        this.setState({
+            customFullUrl: '',
+            customShortUrl: ''
+        })
     }
 
     componentDidMount() {
@@ -71,7 +101,7 @@ class UserLogin extends React.Component {
                     <div className="shortner-containers">
                         <div className="shortner-container">
                             <h3>General Shortner</h3>
-                            <form className="url-form mt-4" onSubmit={(e) => this._generalUrlRequest(e)}>
+                            <form className="url-form general-form" onSubmit={(e) => this._generalUrlRequest(e)}>
                                 <input type="text"
                                         className="url-input my-1"
                                         placeholder="URL to shorten..."
@@ -81,7 +111,7 @@ class UserLogin extends React.Component {
                                 <input
                                     type="submit"
                                     className="my-1"
-                                    value="Submit" disabled={this.props.inFlight}
+                                    value="Shorten!" disabled={this.props.inFlight}
                                 />
                             </form>
                             {this._renderMostRecentGeneralUrl()}
@@ -104,13 +134,40 @@ class UserLogin extends React.Component {
                                 <input
                                     type="submit"
                                     className="my-1"
-                                    value="Submit" disabled={this.props.inFlight}
+                                    value="Shorten!" disabled={this.props.inFlight}
                                 />
                             </form>
                             {this._renderMostRecentCustomUrl()}
                         </div>
                     </div>
                 </div>
+
+                {/* Modal to Edit Custom Url */}
+                <Modal show={this.state.showEditModal} onHide={() => this.closeEditModal()}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Edit Custom Url: {this.props.mostRecentCustomUrl}</Modal.Title>
+                    </Modal.Header>
+                    <form onSubmit={(e) => this._editUrlRequest(e)}>
+                    <Modal.Body>
+                        <input type="text"
+                            className="url-input my-1"
+                            placeholder="New Custom Route Ending..."
+                            disabled={this.props.inFlight}
+                            value={this.state.editShortUrl}
+                            onChange={(e) => this._handleEditFormUpdate(e, 'editShortUrl')}/>   
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={() => this.closeEditModal()}>
+                            Cancel
+                        </Button>
+                        <input
+                            type="submit"
+                            className="my-1"
+                            value="Submit" disabled={this.props.inFlight}
+                        />
+                    </Modal.Footer>
+                    </form>
+                </Modal>
             </div>
         );
     }
@@ -118,8 +175,9 @@ class UserLogin extends React.Component {
     _renderMostRecentGeneralUrl() {
         if (this.props.mostRecentGeneralUrl) {
             return (
-                <div>
-                    <a href={window.location.protocol +'//'+ window.location.host + '/url/' + this.props.mostRecentGeneralUrl}>
+                <div className="short-url-link-container">
+                    <p className="link-label">Shortened Url:</p>
+                    <a className="short-url-link" href={window.location.protocol +'//'+ window.location.host + '/url/' + this.props.mostRecentGeneralUrl}>
                         {window.location.protocol +'//'+ window.location.host + '/url/' + this.props.mostRecentGeneralUrl}
                     </a>
                 </div>
@@ -132,10 +190,21 @@ class UserLogin extends React.Component {
     _renderMostRecentCustomUrl() {
         if (this.props.mostRecentCustomUrl) {
             return (
-                <div>
-                    <a href={window.location.protocol +'//'+ window.location.host + '/url/' + this.props.mostRecentCustomUrl}>
-                        {window.location.protocol +'//'+ window.location.host + '/url/' + this.props.mostRecentCustomUrl}
-                    </a>
+                <div className="url-container border-top">
+                    <div className="short-url-link-container">
+                        <p className="link-label">Shortened Url:</p>
+                        <a className="short-url-link"href={window.location.protocol +'//'+ window.location.host + '/url/' + this.props.mostRecentCustomUrl}>
+                            {window.location.protocol +'//'+ window.location.host + '/url/' + this.props.mostRecentCustomUrl}
+                        </a>
+                    </div>
+                    <div className="short-url-options">
+                        <button onClick={() => this.openEditModal()}>
+                            Edit
+                        </button>
+                        <button onClick={(e) => this.props.deleteCustomUrl(this.props.mostRecentCustomUrl)}>
+                            Delete
+                        </button>
+                    </div>
                 </div>
             )
         } else {
@@ -148,7 +217,9 @@ class UserLogin extends React.Component {
 function mapDispatchToProps(dispatch, props) {
     return {
         generalUrlRequest: (urlRequest) => dispatch(generalUrlRequest(urlRequest)),
-        customUrlRequest: (urlRequest) => dispatch(customUrlRequest(urlRequest))
+        customUrlRequest: (urlRequest) => dispatch(customUrlRequest(urlRequest)),
+        editUrlRequest: (urlToUpdate, urlRequest) => dispatch(editUrlRequest(urlToUpdate, urlRequest)),
+        deleteCustomUrl: (customUrl) => dispatch(deleteCustomUrl(customUrl)),
     }
 };
 

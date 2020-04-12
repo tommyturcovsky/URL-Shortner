@@ -29,7 +29,7 @@ html, body {
 }
 
 .shortner-container {
-    border: solid 2px;
+    border: solid 2px ;
     margin: .5em;
     padding: .5em;
     width: 40%;
@@ -43,14 +43,70 @@ html, body {
     flex-wrap: wrap;
 }
 
+.general-form {
+    margin-top: 1.5rem;
+}
+
 .url-input {
     display: block;
     width: 70%;
+    border: 1px solid #ccc;
+    border-radius: 2px;
 }
 
-@media (max-width: 576px) {
+input[type=button], input[type=submit], button {
+    background-color: #2d67be;
+    border: solid 2px;
+    border-radius: 2px;
+    border-color: #242424;
+    color: white;
+    padding: 2px 8px;
+    cursor: pointer;
+}
+
+input[type=button], input[type=submit]:hover {
+    background-color: #154da0;
+}
+
+.url-container {
+    margin-top: 1rem;
+    padding-top: .5em;
+}
+
+.short-url-link-container {
+    margin-bottom: .5em;
+}
+
+.short-url-link {
+    word-wrap: break-word;
+    margin-left: .4em;
+}
+
+.short-url-options {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
+
+.link-label {
+    display: inline;
+    text-decoration: underline;
+}
+
+@media (max-width: 750px) {
     .url-input {
+        width: 80%
+    }
+
+    .shortner-containers {
+        flex-direction: column;
+    }
+    .shortner-container {
         width: 100%
+    }
+
+    .general-form {
+        margin-top: auto;
     }
     
 }

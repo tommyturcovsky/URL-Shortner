@@ -26,9 +26,14 @@ function redirectToFullUrl(shortUrl) {
     return ShortUrlModel.findOne({ short: shortUrl })
 }
 
-// function deleteShortUrlById(idToFind) {
-//     return ShortUrlModel.deleteOne({ _id: idToFind }).exec();
-// }
+async function updateShortUrl(shortUrlToUpdate, newShortUrl) {
+    await ShortUrlModel.findOneAndUpdate({ short: shortUrlToUpdate }, { short: newShortUrl }).exec();
+    return ShortUrlModel.findOne({ short: newShortUrl }).exec();
+}
+
+function deleteShortUrl(shortUrlToDelete) {
+    return ShortUrlModel.deleteOne({ shortUrl: shortUrlToDelete }).exec();
+}
 
 // function updateShortUrl(idToUpdate, newValues) {
 //     ShortUrlModel.updateOne({ _id: idToUpdate }, newValues).exec();
@@ -40,7 +45,9 @@ module.exports = {
     insertShortUrl,
     getAllShortUrl,
     findShortUrlById,
-    redirectToFullUrl
+    redirectToFullUrl,
+    deleteShortUrl,
+    updateShortUrl
     // deleteShortUrlById,
     // updateShortUrl
 };

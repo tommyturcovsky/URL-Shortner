@@ -30,6 +30,18 @@ router.get('/url/:shortUrl', async function (req, res) {
         (error) =>  response.status(404).send(`Error finding ShortUrl:${error}`));
 })
 
+router.put('/url/:shortUrl', async function (req, res) {
+    return await ShortUrlAccessor.updateShortUrl(req.params.shortUrl, req.body.short)
+        .then((response) => res.status(200).send(response),
+            (error) => res.status(404).send(`Error finding ShortUrl:${error}`));
+})
+
+router.delete('/url/:shortUrl', (req, res) => {
+    return ShortUrlAccessor.deleteShortUrl(req.params.shortUrl)
+        .then((response) => res.status(200).send(response),
+        (error) => response.status(404).send(`Error deleting ShortUrl:${error}`));
+})
+
 // router.delete('/:id', function (req, res) {
 //     return ShortUrlAccessor.deleteShortUrlById(req.params.id)
 //         .then((response) => res.status(200).send(response),

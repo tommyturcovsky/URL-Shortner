@@ -27,11 +27,16 @@ export function mostRecentCustomUrl(
     },
     action
 ) {
+    console.log("reducer: " + action.shortUrlCustom)
     switch (action.type) {
         case 'RECEIVE_CUSTOM_SHORT_URL':
             return Object.assign({}, state, {
                 shortUrlCustom: action.shortUrlCustom,
             });
+        case 'CUSTOM_URL_DELETED':
+            return Object.assign({}, state, {
+                shortUrlCustom: undefined
+            })
         default:
             return state
     }
