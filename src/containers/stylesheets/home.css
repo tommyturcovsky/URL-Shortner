@@ -52,6 +52,7 @@ html, body {
     width: 70%;
     border: 1px solid #ccc;
     border-radius: 2px;
+    padding-left: 4px;
 }
 
 input[type=button], input[type=submit], button {
@@ -107,6 +108,11 @@ input[type=button], input[type=submit]:hover {
 
     .general-form {
         margin-top: auto;
+    }
+
+    .home-container {
+        /* padding: 5px; */
+        padding-right: 32px;
     }
     
 }

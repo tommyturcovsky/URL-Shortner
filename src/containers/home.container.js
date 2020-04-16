@@ -19,6 +19,16 @@ class UserLogin extends React.Component {
         };
     }
 
+    validURL(str) {
+        var pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
+          '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
+          '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
+          '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
+          '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
+          '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
+        return !!pattern.test(str);
+      }
+
     openEditModal() {
         this.setState({
             showEditModal: true
@@ -38,12 +48,16 @@ class UserLogin extends React.Component {
     }
 
     _editUrlRequest() {
-        let urlToUpdate = this.props.mostRecentCustomUrl
-        this.props.editUrlRequest(urlToUpdate, this.state);
-        event.preventDefault();
-        this.setState({
-            showEditModal: false
-        })
+        if (this.state.editShortUrl.includes(" ")) {
+            alert("Custom URL must contain no spaces");
+        } else {
+            let urlToUpdate = this.props.mostRecentCustomUrl
+            this.props.editUrlRequest(urlToUpdate, this.state);
+            event.preventDefault();
+            this.setState({
+                showEditModal: false
+            })
+        }
     }
 
     _handleCustomFormUpdate(event, value) {
@@ -53,8 +67,14 @@ class UserLogin extends React.Component {
     }
 
     _customUrlRequest() {
-        this.props.customUrlRequest(this.state);
-        event.preventDefault();
+        if (!this.validURL(this.state.customFullUrl)) {
+            alert("Not a Valid URL");
+        } else if (this.state.customShortUrl.includes(" ")) {
+            alert("Custom URL must contain no spaces");
+        } else {
+            this.props.customUrlRequest(this.state);
+            event.preventDefault();
+        }
     }
 
     _handleGeneralFormUpdate(event, value) {
@@ -64,12 +84,17 @@ class UserLogin extends React.Component {
     }
 
     _generalUrlRequest() {
-        this.props.generalUrlRequest(this.state);
-        event.preventDefault();
-        this.setState({
-            customFullUrl: '',
-            customShortUrl: ''
-        })
+        if (!this.validURL(this.state.generalFullUrl)) {
+            alert("Not a Valid URL");
+        } else {
+            this.props.generalUrlRequest(this.state);
+            event.preventDefault();
+            this.setState({
+                customFullUrl: '',
+                customShortUrl: ''
+            })
+        }
+
     }
 
     componentDidMount() {
